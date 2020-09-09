@@ -2,6 +2,7 @@ import requests, os
 from prettytable import PrettyTable
 from colorama import Fore, Back, Style
 from time import sleep
+from tqdm import tqdm
 
 try:
 	def clear():
@@ -15,13 +16,13 @@ try:
 		st = input("From which rank do you wanna see the table? : ")
 		lim = input("How many do wanna see? (Maximum 100 possible): ")
 		t = input("How frequently do you wanna refresh? : ")
-		if lim == "":
+		if not lim.isdecimal():
 			lim = "10"
-		if st == "":
+		if not st.isdecimal():
 			st = "0"
 		else:
 			st = str(int(st) - 1)
-		if t == "":
+		if not t.isdecimal():
 			t = 5
 		else:
 			t = int(t)
@@ -60,7 +61,7 @@ try:
 		data = request.json()["data"]
 		#print(data[0])
 		
-		table = PrettyTable(["RANK", "ID", "SYMBOL", "NAME", "PRICE($)", "PRICE(btc)", "1h(%)", "24h(%)", "7d(%)", "MARKET CAP", "VOLUME24"])
+		table = PrettyTable([Fore.CYAN + "RANK", "ID", "SYMBOL", "NAME", "PRICE($)", "PRICE(btc)", "1h(%)", "24h(%)", "7d(%)", "MARKET CAP", "VOLUME24" + Style.RESET_ALL])
 		
 		for j in data:
 			tabcre(table, j)
@@ -77,9 +78,15 @@ try:
 		print()
 		print(table)
 		print()
-		for i in range(t, 0, -1):
-			print(i, end="\r", flush=True)
-			sleep(1)
+		i = float(t)
+		'''
+		while i > 0:
+			print(str(round(i, 1)), end="\r", flush=True)
+			sleep(0.1)
+			i -= 0.1
+		'''
+		for j in tqdm(range(100), desc=Fore.MAGENTA + "REFRESH BAR", ncols=66):
+			sleep(i / 100)
 		print(Back.WHITE + Fore.BLACK + "REFRESH" + Style.RESET_ALL)
 
 	def cuschar():
@@ -101,7 +108,7 @@ try:
 				cl += [int(a)]
 				i += 1
 			except:
-				print("Enter valid id")
+				print(Back.BLACK + Fore.RED + "Enter valid id" + Style.RESET_ALL)
 			prom = "Enter id " + str(i) + ": "
 			a = input(prom)
 
@@ -113,7 +120,7 @@ try:
 		custab(cl, t)
 
 	def custab(cl, t):
-		table = PrettyTable(["RANK", "ID", "SYMBOL", "NAME", "PRICE($)", "PRICE(btc)", "1h(%)", "24h(%)", "7d(%)", "MARKET CAP", "VOLUME24"])
+		table = PrettyTable([Fore.CYAN + "RANK", "ID", "SYMBOL", "NAME", "PRICE($)", "PRICE(btc)", "1h(%)", "24h(%)", "7d(%)", "MARKET CAP", "VOLUME24" + Style.RESET_ALL])
 		for i in cl:
 			url = "https://api.coinlore.net/api/ticker/?id=" + str(i)
 			request = requests.get(url)
@@ -140,5 +147,5 @@ try:
 		cuschar()
 	
 except:
-	print("\n")
+	print()
 	print(Back.WHITE + Fore.BLACK + "END" + Style.RESET_ALL)
